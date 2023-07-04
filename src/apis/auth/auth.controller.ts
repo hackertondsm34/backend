@@ -1,14 +1,19 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { DynamicAuthGuard } from './guards/dynamic-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('/login/:social')
+  @Get(':social')
   @UseGuards(DynamicAuthGuard)
-  loginOAuth(@Req() req: Request, @Res() res: Response) {
-    return this.authService.
+  async loginOAuth(@Req() req: any, @Res() res: Response) { }
+
+  @Get(':social/redirect')
+  @UseGuards(DynamicAuthGuard)
+  async redirectOAuth(@Req() req: any, @Res() res: Response) {
+    this.authService.login(req, res);
   }
 }
