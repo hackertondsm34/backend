@@ -9,3 +9,49 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  user_id String @id @default(uuid())
+  email String @unique @db.VarChar(30)
+  name String @db.VarChar(10)
+  total_score Int
+  questions Question[]
+  answers Answer[]
+}
+
+model Quiz {
+  quiz_id String @id @default(uuid())
+  content String @db.VarChar(255)
+  score Int
+  attampt_count Int
+  corract_rate Decimal
+  image_url String
+  type QuizType
+}
+
+model Question {
+  question_id String @id @default(uuid())
+  title String @db.VarChar(20)
+  content String
+  created_at DateTime
+  user_id String
+  type String
+  user User @relation(fields: [user_id], references: [user_id])
+  answers Answer[]
+}
+
+model Answer {
+  answer_id String @id @default(uuid())
+  answer String @db.VarChar(50)
+  created_at DateTime
+  question_id String
+  user_id String
+  user User @relation(fields: [user_id], references: [user_id])
+  question Question @relation(fields: [question_id], references: [question_id])
+}
+
+
+enum QuizType {
+  OX
+  ANSWER
+}
