@@ -21,7 +21,7 @@ export class AuthService {
                await this.createUser(email);
           }
 
-          const token = await this.tokenProvider.generateToken(email)
+          const token = process.env.JWT_PREFIX + " " + await this.tokenProvider.generateToken(email);
 
           res.json({token});
      }
