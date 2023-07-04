@@ -17,7 +17,6 @@ export class AuthService {
      async login(req: any, res: Response) {
           const { email } = req.user;
           const user = await this.userRepository.findUserByEmail(email);
-          console.log(user);
           if (user == null) {
                await this.createUser(email);
           }
