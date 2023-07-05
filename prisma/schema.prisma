@@ -18,6 +18,7 @@ model User {
 }
 
 model Quiz {
+<<<<<<< HEAD
   quiz_id       String   @id @default(uuid())
   content       String   @db.VarChar(255)
   score         Int
@@ -42,6 +43,33 @@ model Answer {
   answer_id   String   @id @default(uuid())
   answer      String   @db.VarChar(50)
   created_at  DateTime @default(now())
+=======
+  quiz_id String @id @default(uuid())
+  content String @db.VarChar(255)
+  score Int
+  answer String
+  attampt_count Int
+  corract_count Int
+  image_url String
+  type QuizType
+}
+
+model Question {
+  question_id String @id @default(uuid())
+  title String @db.VarChar(20)
+  content String
+  created_at DateTime @default(now())
+  user_id String
+  type String
+  user User @relation(fields: [user_id], references: [user_id])
+  answers Answer[]
+}
+
+model Answer {
+  answer_id String @id @default(uuid())
+  answer String @db.VarChar(50)
+  created_at DateTime @default(now())
+>>>>>>> 37f0435c5965f121d43a17fb16b5ea8707e1ba8b
   question_id String
   user_id     String
   question    Question @relation(fields: [question_id], references: [question_id])
