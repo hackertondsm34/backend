@@ -1,14 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { IApply } from './interfaces/question-service.interface';
+import {
+  IAnswer,
+  IUserId,
+  IgetSpecificQuestion,
+} from './interfaces/question-sevice';
 
 @Injectable()
 export class QuestionService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(params: Prisma.QuestionCreateInput) {
-    return await this.prismaService.question.create({ data: params });
+  async create({
+    user_id,
+    ...others
+  }: Omit<Prisma.QuestionCreateInput, 'user' | 'created_at'> & IUserId) {
+    return await this.prismaService.question.create({
+      data: {
+        user: {
+          connect: { user_id },
+        },
+        ...others,
+      },
+    });
   }
 
   async getAllQuestions() {
@@ -22,7 +36,7 @@ export class QuestionService {
     };
   }
 
-  async getSpecificQuestion({ id }: { id: string }) {
+  async getSpecificQuestion({ id }: IgetSpecificQuestion) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { question_id, user_id, ...others } =
       await this.prismaService.question.findUnique({
@@ -40,7 +54,26 @@ export class QuestionService {
       }),
     };
   }
-  async apply(data: Prisma.AnswerCreateInput) {
-    return await this.prismaService.answer.create({ data });
+
+  async answer({
+    question_id,
+    user_id,
+    ...others
+  }: Omit<Prisma.AnswerCreateInput, 'question' | 'user'> & IAnswer) {
+    return await this.prismaService.answer.create({
+      data: {
+        user: { connect: { user_id } },
+        question: { connect: { question_id } },
+        ...others,
+      },
+    });
+  }
+
+  async myQuestions(user: IUserId) {
+    const questions = await this.prismaService.question.findMany({
+      where: { user },
+      include: { answers: true },
+    });
+    return { questions };
   }
 }

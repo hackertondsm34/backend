@@ -1,57 +1,52 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
 }
 
 model User {
-  user_id String @id @default(uuid())
-  email String @unique @db.VarChar(30)
-  name String @db.VarChar(10)
+  user_id     String     @id @default(uuid())
+  email       String     @unique @db.VarChar(30)
+  name        String     @db.VarChar(10)
   total_score Int
-  questions Question[]
-  answers Answer[]
+  answers     Answer[]
+  questions   Question[]
 }
 
 model Quiz {
-  quiz_id String @id @default(uuid())
-  content String @db.VarChar(255)
-  score Int
+  quiz_id       String   @id @default(uuid())
+  content       String   @db.VarChar(255)
+  score         Int
   attampt_count Int
-  corract_rate Decimal
-  image_url String
-  type QuizType
+  corract_rate  Decimal
+  image_url     String
+  type          QuizType
 }
 
 model Question {
-  question_id String @id @default(uuid())
-  title String @db.VarChar(20)
-  content String
-  created_at DateTime
-  user_id String
-  type String
-  user User @relation(fields: [user_id], references: [user_id])
-  answers Answer[]
+  question_id String   @id @default(uuid())
+  title       String   @db.VarChar(20)
+  content     String
+  created_at  DateTime @default(now())
+  user_id     String
+  type        String
+  answers     Answer[]
+  user        User     @relation(fields: [user_id], references: [user_id])
 }
 
 model Answer {
-  answer_id String @id @default(uuid())
-  answer String @db.VarChar(50)
-  created_at DateTime
+  answer_id   String   @id @default(uuid())
+  answer      String   @db.VarChar(50)
+  created_at  DateTime @default(now())
   question_id String
-  user_id String
-  user User @relation(fields: [user_id], references: [user_id])
-  question Question @relation(fields: [question_id], references: [question_id])
+  user_id     String
+  question    Question @relation(fields: [question_id], references: [question_id])
+  user        User     @relation(fields: [user_id], references: [user_id])
 }
-
 
 enum QuizType {
   OX
