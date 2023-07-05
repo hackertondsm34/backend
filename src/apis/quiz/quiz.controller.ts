@@ -17,7 +17,7 @@ export class QuizController {
 
      @Get()
      async getQuizzes(): Promise<GetQuizzesResponse> {
-          return this.quizService.getQuizzes();
+          return await this.quizService.getQuizzes();
      }
 
      @UseGuards(AuthGuard('jwt'))
