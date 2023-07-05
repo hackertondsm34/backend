@@ -5,12 +5,20 @@ import { GoogleStrategy } from './apis/auth/strategies/google.strategy';
 import { UserModule } from './apis/user/user.module';
 import { KakaoStrategy } from './apis/auth/strategies/kakao.strategy';
 import { NaverStrategy } from './apis/auth/strategies/naver.strategy';
+import { QuestionModule } from './apis/question/question.module';
 import { QuizModule } from './apis/quiz/quiz.module';
 import { JwtAccessStrategy } from './apis/auth/strategies/jwt.strategy';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, QuizModule, JwtModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    UserModule,
+    QuizModule,
+    JwtModule,
+    QuestionModule,
+  ],
   controllers: [],
   providers: [GoogleStrategy, KakaoStrategy, NaverStrategy, JwtAccessStrategy],
 })
