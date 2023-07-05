@@ -15,7 +15,15 @@ export class QuizService {
           const quiz = await this.quizRepository.queryAllQuizzes();
 
           return {
-               questions: quiz
+               questions: quiz.map(quiz => {
+                    return {
+                         quiz_id: quiz.quiz_id,
+                         content: quiz.content,
+                         image_url: quiz.image_url,
+                         type: quiz.type,
+                         correct_rate: quiz.corract_count /quiz.attampt_count * 100
+                    }
+               })
           }
      }
 

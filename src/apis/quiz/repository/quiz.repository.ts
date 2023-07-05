@@ -10,15 +10,8 @@ export class QuizRepository {
           private prismaService: PrismaService
      ) {}
 
-     async queryAllQuizzes(): Promise<QuizDto[]> {
-          return await this.prismaService.quiz.findMany({
-               select: {
-                    quiz_id: true,
-                    content: true,
-                    image_url: true,
-                    type: true
-               }
-          });
+async queryAllQuizzes(): Promise<Quiz[]> {
+          return await this.prismaService.quiz.findMany();
      }
 
      async queryQuizzById(quizId: string): Promise<Quiz> {

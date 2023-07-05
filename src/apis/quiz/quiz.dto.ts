@@ -9,7 +9,8 @@ export interface QuizDto {
      quiz_id: string,
      content: string,
      image_url: string,
-     type: QuizType
+     type: QuizType,
+     correct_rate: number
 }
 
 export interface CheckAnswerReponse {
