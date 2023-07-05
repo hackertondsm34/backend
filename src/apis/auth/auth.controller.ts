@@ -9,7 +9,7 @@ export class AuthController {
 
   @Get(':social')
   @UseGuards(DynamicAuthGuard)
-  async loginOAuth(@Req() req: any, @Res() res: Response) { }
+  async loginOAuth(@Req() req: any, @Res() res: Response) {}
 
   @Get(':social/redirect')
   @UseGuards(DynamicAuthGuard)
