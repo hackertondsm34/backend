@@ -15,7 +15,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   validate(accessToken: string, refreshToken: string, profile: Profile) {
     const { id, name, emails } = profile;
     return {
-      provider: 'google',
+      provider: 'naver',
       providerId: id,
       name: name,
       email: emails[0].value,

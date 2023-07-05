@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
+  Param,
   Post,
   Query,
   Req,
@@ -11,55 +13,43 @@ import { QuestionService } from './question.service';
 import { AuthGuard } from '@nestjs/passport';
 import { IAuthUser } from 'src/common/interfaces/context';
 import { Request } from 'express';
+import { CreateAnswerRequest, CreateQuestionRequest, QueryQeustionsResponse } from './question.dto';
+import { REQUEST } from '@nestjs/core';
 
 @Controller('questions')
 export class QuestionController {
-  constructor(private readonly questionService: QuestionService) {}
+  constructor(
+      private readonly questionService: QuestionService,
+    
+      @Inject(REQUEST)
+      private request: IAuthUser
+    ) {}
 
   @Get()
-  getAllQuestion() {
-    return this.questionService.getAllQuestions();
+  async getAllQuestion(): Promise<QueryQeustionsResponse> {
+    return await this.questionService.getAllQuestions();
   }
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  create(
-    @Body('title') title: string,
-    @Body('content') content: string,
-    @Body('type') type: string,
-    @Req() request: Request & IAuthUser,
-  ) {
-    return this.questionService.create({
-      title,
-      content,
-      type,
-      user_id: request.user.user_id,
-    });
+  async createQuestion(@Body() request: CreateQuestionRequest) {
+    this.questionService.createQeustion(request, this.request.user.user_id);
   }
 
-  @Get('/specific')
-  @UseGuards(AuthGuard('jwt'))
-  getSpecificQuestion(@Query('id') id: string) {
-    return this.questionService.getSpecificQuestion({ id });
+  @Get('/:questionId')
+  async getQuestionDetail(@Param('questionId') questionId: string) {
+    return await this.questionService.getSpecificQuestion(questionId);
   }
 
   @Post('/answer')
   @UseGuards(AuthGuard('jwt'))
-  answer(
-    @Query('id') question_id: string,
-    @Body('answer') answer: string,
-    @Req() request: Request & IAuthUser,
-  ) {
-    return this.questionService.answer({
-      question_id,
-      answer,
-      user_id: request.user.user_id,
-    });
+  async answerQuestion(@Body() request: CreateAnswerRequest, @Query('id') questionId: string) {
+    return this.questionService.answerQuestion(questionId, this.request.user.user_id, request.answer);
   }
 
   @Get('/my')
   @UseGuards(AuthGuard('jwt'))
-  myQuestions(@Req() request: Request & IAuthUser) {
+  async myQuestions(@Req() request: Request & IAuthUser) {
     return this.questionService.myQuestions({ user_id: request.user.user_id });
   }
 }

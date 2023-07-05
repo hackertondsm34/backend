@@ -10,7 +10,7 @@ datasource db {
 
 model User {
   user_id     String     @id @default(uuid())
-  email       String     @unique @db.VarChar(30)
+  email       String     @unique @db.VarChar(80)
   name        String     @db.VarChar(10)
   total_score Int
   answers     Answer[]
@@ -22,7 +22,8 @@ model Quiz {
   content       String   @db.VarChar(255)
   score         Int
   attampt_count Int
-  corract_rate  Decimal
+  corract_count Int
+  answer        String
   image_url     String
   type          QuizType
 }
@@ -39,16 +40,13 @@ model Question {
 }
 
 model Answer {
-  answer_id   String   @id @default(uuid())
-  answer      String   @db.VarChar(50)
-  created_at  DateTime @default(now())
-  quiz_id String @id @default(uuid())
-  content String @db.VarChar(255)
-  score Int
-  attampt_count Int
-  corract_count Int
-  image_url String
-  type QuizType
+  answer_id String @id @default(uuid())
+  answer String @db.VarChar(50)
+  created_at DateTime @default(now())
+  question_id String
+  user_id String
+  user User @relation(fields: [user_id], references: [user_id])
+  question Question @relation(fields: [question_id], references: [question_id])
 }
 
 enum QuizType {

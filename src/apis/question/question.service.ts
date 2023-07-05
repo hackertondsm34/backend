@@ -1,79 +1,73 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/common/prisma/prisma.service';
-import {
-  IAnswer,
-  IUserId,
-  IgetSpecificQuestion,
-} from './interfaces/question-sevice';
+import { IUserId } from './interfaces/question-sevice';
+import { CreateQuestionRequest, QueryQeustionsResponse, QuestionResponse, SpecificQuestionResponse } from './question.dto';
+import { QuestionRepository } from './repository/question.repository';
+import { UserRepository } from '../user/repository/user.repository';
+import { AnswerRepository } from './repository/answer.repository';
 
 @Injectable()
 export class QuestionService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private questionRepository: QuestionRepository,
+    private userRepository: UserRepository,
+    private answerRepository: AnswerRepository
+  ) {}
 
-  async create({
-    user_id,
-    ...others
-  }: Omit<Prisma.QuestionCreateInput, 'user' | 'created_at'> & IUserId) {
-    return await this.prismaService.question.create({
-      data: {
-        user: {
-          connect: { user_id },
-        },
-        ...others,
-      },
+  async createQeustion(request: CreateQuestionRequest, userEmail: string) {
+    const user = await this.userRepository.findUserByEmail(userEmail);
+
+    this.questionRepository.saveQuestion({
+      title: request.title,
+      content: request.content,
+      user_id: user.user_id,
+      type: request.type
     });
   }
 
-  async getAllQuestions() {
-    const questions = await this.prismaService.question.findMany();
-    return {
-      questions: questions.map((e) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { user_id, question_id, content, ...others } = e;
-        return { id: question_id, ...others };
-      }),
-    };
-  }
+  async getAllQuestions(): Promise<QueryQeustionsResponse> {
+    const questions = await this.questionRepository.findAllQuestions();
 
-  async getSpecificQuestion({ id }: IgetSpecificQuestion) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { question_id, user_id, ...others } =
-      await this.prismaService.question.findUnique({
-        where: { question_id: id },
-      });
-    const answers = await this.prismaService.answer.findMany({
-      where: { question_id: id },
-      include: { user: true },
+    const questionsResponse: QuestionResponse[] = questions.map(question => {
+      return {
+        id: question.question_id,
+        title: question.title,
+        type: question.type,
+        created_at: question.created_at
+      }
     });
+
+    return { questions: questionsResponse };
+  }
+
+  async getSpecificQuestion(questionId: string): Promise<SpecificQuestionResponse> {
+    const question = await this.questionRepository.findByIdWithAnswers(questionId);
+
     return {
-      ...others,
-      answers: answers.map((e) => {
-        const { user, created_at, answer } = e;
-        return { created_at, answer, user_name: user.name };
-      }),
+      title: question.title,
+      content: question.content,
+      type: question.type,
+      created_date: question.created_at,
+      answers: question.answers.map(answer => {
+        return {
+          user_name: answer.user.name,
+          content: answer.answer,
+          created_date: answer.created_at
+        }
+      })
     };
   }
 
-  async answer({
-    question_id,
-    user_id,
-    ...others
-  }: Omit<Prisma.AnswerCreateInput, 'question' | 'user'> & IAnswer) {
-    return await this.prismaService.answer.create({
-      data: {
-        user: { connect: { user_id } },
-        question: { connect: { question_id } },
-        ...others,
-      },
+  async answerQuestion(questionId: string, userEmail: string, answer: string) {
+    const user = await this.userRepository.findUserByEmail(userEmail);
+    const question = await this.questionRepository.findById(questionId);
+
+    this.answerRepository.saveAnswer({
+      answer, user_id: user.user_id, question_id: question.question_id
     });
   }
 
   async myQuestions(user: IUserId) {
-    const questions = await this.prismaService.question.findMany({
-      where: { user },
-      include: { answers: true },
-    });
+    const questions = await this.questionRepository.findAllQuestionsByUserId(user.user_id);
     return { questions };
   }
 }

@@ -6,7 +6,7 @@ import { PrismaModule } from "src/common/prisma/prisma.module";
 import { UserModule } from "../user/user.module";
 
 @Module({
-     imports: [PrismaModule, UserModule],
+     imports: [],
      controllers: [QuizController],
      providers: [QuizService, QuizRepository],
      exports: [QuizRepository]

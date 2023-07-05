@@ -16,8 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
     AuthModule,
     UserModule,
     QuizModule,
-    JwtModule,
-    QuestionModule,
+    QuestionModule
   ],
   controllers: [],
   providers: [GoogleStrategy, KakaoStrategy, NaverStrategy, JwtAccessStrategy],
