@@ -1,4 +1,6 @@
-import { ArgumentsHost, Catch, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import e from "express";
 
 interface ErrorResponse {
   statusCode: number;
@@ -19,27 +21,35 @@ export class BaseExeption extends Error {
 }
 
 @Catch()
-export class ExceptionHandler implements ExceptionHandler {
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest<Request>();
+export class GlobalExceptionHandler implements ExceptionFilter {
+     catch(exception: any, host: ArgumentsHost) {
+          const ctx = host.switchToHttp();
+          const response = ctx.getResponse();
+          const request = ctx.getRequest<Request>();
 
-    const isHandled = exception instanceof BaseExeption;
-    const status = isHandled ? exception.status : 500;
-    const message = isHandled ? exception.message : 'Internal Server Error';
+          
+          if (exception instanceof BadRequestException) {
+               return response.status(400).json(exception);
+          }
+
+          const isHandled = exception instanceof BaseExeption;
+          const status = isHandled ? exception.status : 500;
+          const message = isHandled ? exception.message : 'Internal Server Error';
 
     if (!isHandled) {
       console.error(exception);
     }
 
-    const jsonResponse: ErrorResponse = {
-      statusCode: status,
-      message: message,
-      url: request.url,
-      timeStamp: new Date(),
-    };
-
-    response.status(status).json(jsonResponse);
-  }
+          if (exception instanceof BadRequestException) {
+               
+          } 
+          const jsonResponse: ErrorResponse = {
+               statusCode: status,
+               message: message,
+               url: request.url,
+               timeStamp: new Date()
+          };
+          
+          response.status(status).json(jsonResponse);
+     }
 }
