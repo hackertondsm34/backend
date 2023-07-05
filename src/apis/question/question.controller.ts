@@ -10,9 +10,9 @@ import {
 import { QuestionService } from './question.service';
 import { AuthGuard } from '@nestjs/passport';
 import { IAuthUser } from 'src/common/interfaces/context';
-import { Request, request } from 'express';
+import { Request } from 'express';
 
-@Controller('question')
+@Controller('questions')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 

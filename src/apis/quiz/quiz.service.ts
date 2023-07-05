@@ -21,7 +21,7 @@ export class QuizService {
                          content: quiz.content,
                          image_url: quiz.image_url,
                          type: quiz.type,
-                         correct_rate: quiz.corract_count /quiz.attampt_count * 100
+                         correct_rate: quiz.corract_count / quiz.attampt_count * 100
                     }
                })
           }
@@ -29,6 +29,7 @@ export class QuizService {
 
      async checkAnswer(questionId: string, answer: string, userId: string): Promise<CheckAnswerReponse> {
           const quiz = await this.quizRepository.queryQuizzById(questionId);
+          
           const user = await this.userRepository.findUserByEmail(userId);
 
           const isCorrect = quiz.answer === answer;

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/common/prisma/prisma.service";
-import { QuizDto } from "../quiz.dto";
 import { Prisma, Quiz } from "@prisma/client";
+import { QuizNotFoundException } from "../quiz.exceptions";
 
 @Injectable()
 export class QuizRepository {
@@ -15,9 +15,15 @@ async queryAllQuizzes(): Promise<Quiz[]> {
      }
 
      async queryQuizzById(quizId: string): Promise<Quiz> {
-          return await this.prismaService.quiz.findUniqueOrThrow({
+          const quiz = await this.prismaService.quiz.findUnique({
                where: {quiz_id: quizId}
           });
+
+          if (quiz == null) {
+               throw QuizNotFoundException.EXCEPTION;
+          }
+
+          return quiz;
      }
 
      async saveQuizz(quiz: Prisma.QuizCreateInput) {
